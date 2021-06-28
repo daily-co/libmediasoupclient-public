@@ -127,10 +127,26 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 	"${LIBWEBRTC_INCLUDE_PATH}/third_party/abseil-cpp"
 )
 
+if(${LIBWEBRTC_BINARY_PATH} MATCHES ".*/WebRTC\\.framework")
+	message(DEBUG "Detected framework path.")
+	target_link_libraries(${PROJECT_NAME} PUBLIC
+		WEBRTC_FRAMEWORK
+	)
+elseif(${LIBWEBRTC_BINARY_PATH} MATCHES ".*/libwebrtc\\.${CMAKE_STATIC_LIBRARY_SUFFIX}")
+	message(DEBUG "Detected static library path.")
+	target_link_libraries(${PROJECT_NAME} PUBLIC
+		${LIBWEBRTC_BINARY_PATH}
+	)
+else()
+	message(DEBUG "Detected implicit static library path.")
+    target_link_libraries(${PROJECT_NAME} PUBLIC
+		${LIBWEBRTC_BINARY_PATH}/libwebrtc${CMAKE_STATIC_LIBRARY_SUFFIX}
+	)
+endif()
+
 # Public (interface) dependencies.
 target_link_libraries(${PROJECT_NAME} PUBLIC
 	sdptransform
-	${LIBWEBRTC_BINARY_PATH}/libwebrtc${CMAKE_STATIC_LIBRARY_SUFFIX}
 )
 
 # Compile definitions for libwebrtc.
