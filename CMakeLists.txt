@@ -129,8 +129,18 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 
 if(${LIBWEBRTC_BINARY_PATH} MATCHES ".*/WebRTC\\.framework")
 	message(DEBUG "Detected framework path.")
+	get_filename_component(LIBWEBRTC_BINARY_DIR ${LIBWEBRTC_BINARY_PATH} DIRECTORY)
+	list(APPEND CMAKE_FRAMEWORK_PATH ${LIBWEBRTC_BINARY_DIR})
+	find_library(WEBRTC_FRAMEWORK
+		NAMES WebRTC
+		# HINT ${LIBWEBRTC_BINARY_DIR}
+		REQUIRED
+	)
+	if(NOT WEBRTC_FRAMEWORK)
+		message(FATAL_ERROR "WebRTC framework not found")
+	endif()
 	target_link_libraries(${PROJECT_NAME} PUBLIC
-		WEBRTC_FRAMEWORK
+		${WEBRTC_FRAMEWORK}
 	)
 elseif(${LIBWEBRTC_BINARY_PATH} MATCHES ".*/libwebrtc\\.${CMAKE_STATIC_LIBRARY_SUFFIX}")
 	message(DEBUG "Detected static library path.")
