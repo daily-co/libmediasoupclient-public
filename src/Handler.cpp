@@ -7,6 +7,7 @@
 #include "ortc.hpp"
 #include "scalabilityMode.hpp"
 #include "sdptransform.hpp"
+#include "scalabilityMode.hpp"
 #include "sdp/Utils.hpp"
 #include <cinttypes> // PRIu64, etc
 
@@ -252,6 +253,33 @@ namespace mediasoupclient
 
 				hackVp9Svc             = true;
 				localSdpObject         = sdptransform::parse(offer);
+				json& offerMediaObject = localSdpObject["media"][mediaSectionIdx.idx];
+
+				Sdp::Utils::addLegacySimulcast(offerMediaObject, spatialLayers);
+
+				offer = sdptransform::write(localSdpObject);
+			}
+
+			std::string scalability_mode =
+			  encodings && encodings->size()
+			    ? ((*encodings)[0].scalability_mode.has_value() ? (*encodings)[0].scalability_mode.value()
+			                                                    : "")
+			    : "";
+
+			const json& layers = parseScalabilityMode(scalability_mode);
+
+			auto spatialLayers = layers["spatialLayers"].get<int>();
+
+			auto mimeType = sendingRtpParameters["codecs"][0]["mimeType"].get<std::string>();
+
+			std::transform(mimeType.begin(), mimeType.end(), mimeType.begin(), ::tolower);
+
+			if (encodings && encodings->size() == 1 && spatialLayers > 1 && mimeType == "video/vp9")
+			{
+				MSC_DEBUG("send() | enabling legacy simulcast for VP9 SVC");
+
+				hackVp9Svc       = true;
+				localSdpObject   = sdptransform::parse(offer);
 				json& offerMediaObject = localSdpObject["media"][mediaSectionIdx.idx];
 
 				Sdp::Utils::addLegacySimulcast(offerMediaObject, spatialLayers);
