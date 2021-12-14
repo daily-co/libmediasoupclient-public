@@ -63,6 +63,11 @@ if(UNIX AND NOT APPLE)
     target_link_libraries(test_mediasoupclient PRIVATE glib-2.0 X11)
 endif()
 
+target_compile_definitions(test_mediasoupclient PUBLIC
+    $<$<PLATFORM_ID:Windows>:NOMINMAX>
+    $<$<PLATFORM_ID:Windows>:WIN32_LEAN_AND_MEAN>
+)
+
 # Private dependencies.
 target_link_libraries(test_mediasoupclient PRIVATE mediasoupclient)
 target_link_libraries(test_mediasoupclient PRIVATE ${CMAKE_DL_LIBS})
