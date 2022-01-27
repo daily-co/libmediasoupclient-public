@@ -76,7 +76,7 @@ namespace mediasoupclient
 	{
 		MSC_TRACE();
 
-		return !this->track->enabled();
+		return this->paused;
 	}
 
 	uint8_t Producer::GetMaxSpatialLayer() const
@@ -130,7 +130,12 @@ namespace mediasoupclient
 			return;
 		}
 
-		this->track->set_enabled(false);
+		this->paused = true;
+
+		if (this->track != nullptr)
+		{
+			this->track->set_enabled(false);
+		}
 	}
 
 	/**
@@ -147,7 +152,12 @@ namespace mediasoupclient
 			return;
 		}
 
-		this->track->set_enabled(true);
+		this->paused = false;
+
+		if (this->track != nullptr)
+		{
+			this->track->set_enabled(true);
+		}
 	}
 
 	/**
@@ -159,9 +169,7 @@ namespace mediasoupclient
 
 		if (this->closed)
 			MSC_THROW_INVALID_STATE_ERROR("Producer closed");
-		else if (track == nullptr)
-			MSC_THROW_TYPE_ERROR("missing track");
-		else if (track->state() == webrtc::MediaStreamTrackInterface::TrackState::kEnded)
+		else if (track && track->state() == webrtc::MediaStreamTrackInterface::TrackState::kEnded)
 			MSC_THROW_INVALID_STATE_ERROR("track ended");
 
 		// Do nothing if this is the same track as the current handled one.
@@ -175,7 +183,6 @@ namespace mediasoupclient
 		// May throw.
 		this->privateListener->OnReplaceTrack(this, track);
 
-		// Keep current paused state.
 		auto paused = IsPaused();
 
 		// Set the new track.
@@ -183,10 +190,13 @@ namespace mediasoupclient
 
 		// If this Producer was paused/resumed and the state of the new
 		// track does not match, fix it.
-		if (!paused)
-			this->track->set_enabled(true);
-		else
-			this->track->set_enabled(false);
+		if (this->track != nullptr)
+		{
+			if (!paused)
+				this->track->set_enabled(true);
+			else
+				this->track->set_enabled(false);
+		}
 	}
 
 	/**
