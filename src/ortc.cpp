@@ -1621,7 +1621,7 @@ static bool matchCodecs(json& aCodec, json& bCodec, bool strict, bool modify)
 			{
 				webrtc::H264GenerateProfileLevelIdForAnswer(aParameters, bParameters, &newParameters);
 			}
-			catch (std::runtime_error)
+			catch (std::runtime_error&)
 			{
 				return false;
 			}

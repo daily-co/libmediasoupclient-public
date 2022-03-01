@@ -358,10 +358,10 @@ namespace mediasoupclient
 			const Sdp::RemoteSdp::MediaSectionIdx mediaSectionIdx =
 			  this->remoteSdp->GetNextMediaSectionIdx();
 
-			auto offerMediaObject =
-			  find_if(localSdpObject["media"].begin(), localSdpObject["media"].end(), [](const json& m) {
-				  return m.at("type").get<std::string>() == "application";
-			  });
+			auto offerMediaObject = find_if(
+			  localSdpObject["media"].begin(),
+			  localSdpObject["media"].end(),
+			  [](const json& m) { return m.at("type").get<std::string>() == "application"; });
 
 			if (offerMediaObject == localSdpObject["media"].end())
 			{
@@ -516,6 +516,68 @@ namespace mediasoupclient
 			MSC_THROW_ERROR("%s", result.message());
 	}
 
+	void SendHandler::SetRtpEncodingParameters(
+	  const std::string& localId, std::vector<webrtc::RtpEncodingParameters> encodings)
+	{
+		MSC_TRACE();
+
+		MSC_DEBUG("[localId:%s]", localId.c_str());
+
+		auto localIdIt = this->mapMidTransceiver.find(localId);
+
+		if (localIdIt == this->mapMidTransceiver.end())
+			MSC_THROW_ERROR("associated RtpTransceiver not found");
+
+		auto* transceiver = localIdIt->second;
+		auto parameters   = transceiver->sender()->GetParameters();
+
+		bool hasLowEncoding{ false };
+		bool hasMediumEncoding{ false };
+		bool hasHighEncoding{ false };
+		webrtc::RtpEncodingParameters* lowEncoding{ nullptr };
+		webrtc::RtpEncodingParameters* mediumEncoding{ nullptr };
+		webrtc::RtpEncodingParameters* highEncoding{ nullptr };
+
+		if (!parameters.encodings.empty())
+		{
+			hasLowEncoding = true;
+			lowEncoding    = &parameters.encodings[0];
+		}
+
+		if (parameters.encodings.size() > 1)
+		{
+			hasMediumEncoding = true;
+			mediumEncoding    = &parameters.encodings[1];
+		}
+
+		if (parameters.encodings.size() > 2)
+		{
+			hasHighEncoding = true;
+			highEncoding    = &parameters.encodings[2];
+		}
+
+		// Edit encodings.
+		if (!encodings.empty())
+		{
+			lowEncoding = &encodings[0];
+		}
+
+		if (encodings.size() > 1)
+		{
+			mediumEncoding = &encodings[1];
+		}
+
+		if (encodings.size() > 2)
+		{
+			highEncoding = &encodings[2];
+		}
+
+		auto result = transceiver->sender()->SetParameters(parameters);
+
+		if (!result.ok())
+			MSC_THROW_ERROR("%s", result.message());
+	}
+
 	json SendHandler::GetSenderStats(const std::string& localId)
 	{
 		MSC_TRACE();
@@ -611,9 +673,9 @@ namespace mediasoupclient
 		auto answer         = this->pc->CreateAnswer(options);
 		auto localSdpObject = sdptransform::parse(answer);
 		auto mediaIt        = find_if(
-      localSdpObject["media"].begin(), localSdpObject["media"].end(), [&localId](const json& m) {
-        return m["mid"].get<std::string>() == localId;
-      });
+      localSdpObject["media"].begin(),
+      localSdpObject["media"].end(),
+      [&localId](const json& m) { return m["mid"].get<std::string>() == localId; });
 
 		auto& answerMediaObject = *mediaIt;
 
@@ -633,9 +695,9 @@ namespace mediasoupclient
 
 		auto transceivers  = this->pc->GetTransceivers();
 		auto transceiverIt = std::find_if(
-		  transceivers.begin(), transceivers.end(), [&localId](webrtc::RtpTransceiverInterface* t) {
-			  return t->mid() == localId;
-		  });
+		  transceivers.begin(),
+		  transceivers.end(),
+		  [&localId](webrtc::RtpTransceiverInterface* t) { return t->mid() == localId; });
 
 		if (transceiverIt == transceivers.end())
 			MSC_THROW_ERROR("new RTCRtpTransceiver not found");

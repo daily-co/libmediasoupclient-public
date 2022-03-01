@@ -221,6 +221,21 @@ namespace mediasoupclient
 	}
 
 	/**
+	 * Sets the RTP encoding parameters for this producer.
+	 */
+	void Producer::SetRtpEncodingParameters(std::vector<webrtc::RtpEncodingParameters> parameters)
+	{
+		MSC_TRACE();
+
+		if (this->closed)
+			MSC_THROW_INVALID_STATE_ERROR("Producer close");
+		else if (this->track->kind() != "video")
+			MSC_THROW_TYPE_ERROR("not a video Producer");
+
+		this->privateListener->OnSetRtpEncodingParameters(this, parameters);
+	}
+
+	/**
 	 * Transport was closed.
 	 */
 	void Producer::TransportClosed()
