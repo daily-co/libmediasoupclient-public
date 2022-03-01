@@ -202,7 +202,8 @@ namespace mediasoupclient
 			std::for_each(
 			  encodings->begin(),
 			  encodings->end(),
-			  [&normalizedEncodings](const webrtc::RtpEncodingParameters& entry) {
+			  [&normalizedEncodings](const webrtc::RtpEncodingParameters& entry)
+			  {
 				  webrtc::RtpEncodingParameters encoding;
 
 				  encoding.active                   = entry.active;
@@ -357,6 +358,14 @@ namespace mediasoupclient
 		MSC_TRACE();
 
 		return this->sendHandler->SetMaxSpatialLayer(producer->GetLocalId(), maxSpatialLayer);
+	}
+
+	void SendTransport::OnSetRtpEncodingParameters(
+	  const Producer* producer, std::vector<webrtc::RtpEncodingParameters> parameters)
+	{
+		MSC_TRACE();
+
+		return this->sendHandler->SetRtpEncodingParameters(producer->GetLocalId(), parameters);
 	}
 
 	json SendTransport::OnGetStats(const Producer* producer)
