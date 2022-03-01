@@ -22,7 +22,9 @@ namespace mediasoupclient
 			virtual void OnReplaceTrack(
 			  const Producer* producer, webrtc::MediaStreamTrackInterface* newTrack)             = 0;
 			virtual void OnSetMaxSpatialLayer(const Producer* producer, uint8_t maxSpatialLayer) = 0;
-			virtual nlohmann::json OnGetStats(const Producer* producer)                          = 0;
+			virtual void OnSetRtpEncodingParameters(
+			  const Producer* producer, std::vector<webrtc::RtpEncodingParameters> parameters) = 0;
+			virtual nlohmann::json OnGetStats(const Producer* producer)                        = 0;
 		};
 
 		/* Public Listener API */
@@ -51,6 +53,7 @@ namespace mediasoupclient
 		webrtc::RtpSenderInterface* GetRtpSender() const;
 		webrtc::MediaStreamTrackInterface* GetTrack() const;
 		const nlohmann::json& GetRtpParameters() const;
+		void SetRtpEncodingParameters(std::vector<webrtc::RtpEncodingParameters>);
 		bool IsPaused() const;
 		uint8_t GetMaxSpatialLayer() const;
 		nlohmann::json& GetAppData();
