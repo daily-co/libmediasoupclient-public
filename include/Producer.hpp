@@ -43,6 +43,9 @@ namespace mediasoupclient
 		  webrtc::RtpSenderInterface* rtpSender,
 		  webrtc::MediaStreamTrackInterface* track,
 		  const nlohmann::json& rtpParameters,
+		  const bool stopTracks,
+		  const bool zeroRtpOnPause,
+		  const bool disableTrackOnPause,
 		  const nlohmann::json& appData);
 
 	public:
@@ -91,6 +94,12 @@ namespace mediasoupclient
 		bool paused{ false };
 		// Video Max spatial layer.
 		uint8_t maxSpatialLayer{ 0 };
+		// Stop tracks
+		// NOTE(jpgneves) - not actually implemented, as we can't stop the tracks
+		bool stopTracks{ false };
+		// Stop sending bytes on pause
+		bool zeroRtpOnPause{ false };
+		bool disableTrackOnPause{ false };
 		// App custom data.
 		nlohmann::json appData;
 	};

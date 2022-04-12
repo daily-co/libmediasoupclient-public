@@ -132,6 +132,9 @@ namespace mediasoupclient
 		  webrtc::MediaStreamTrackInterface* track,
 		  const std::vector<webrtc::RtpEncodingParameters>* encodings,
 		  const nlohmann::json* codecOptions,
+		  const bool stopTracks,
+		  const bool zeroRtpOnPause,
+		  const bool disableTrackOnPause,
 		  const nlohmann::json& appData = nlohmann::json::object());
 
 		DataProducer* ProduceData(
