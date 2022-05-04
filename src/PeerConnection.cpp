@@ -321,7 +321,9 @@ namespace mediasoupclient
 	{
 		MSC_TRACE();
 
-		return this->pc->RemoveTrack(sender);
+		rtc::scoped_refptr<webrtc::RtpSenderInterface> scoped_sender(sender);
+		
+		return this->pc->RemoveTrackOrError(scoped_sender).ok();
 	}
 
 	json PeerConnection::GetStats()
