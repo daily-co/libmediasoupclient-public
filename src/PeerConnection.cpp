@@ -199,7 +199,7 @@ namespace mediasoupclient
 			return future.get();
 		}
 
-		this->pc->SetLocalDescription(observer, sessionDescription);
+		this->pc->SetLocalDescription(observer.get(), sessionDescription);
 
 		return future.get();
 	}
@@ -229,7 +229,7 @@ namespace mediasoupclient
 			return future.get();
 		}
 
-		this->pc->SetRemoteDescription(observer, sessionDescription);
+		this->pc->SetRemoteDescription(observer.get(), sessionDescription);
 
 		return future.get();
 	}
@@ -321,7 +321,9 @@ namespace mediasoupclient
 	{
 		MSC_TRACE();
 
-		return this->pc->RemoveTrack(sender);
+		rtc::scoped_refptr<webrtc::RtpSenderInterface> scoped_sender(sender);
+
+		return this->pc->RemoveTrackOrError(scoped_sender).ok();
 	}
 
 	json PeerConnection::GetStats()

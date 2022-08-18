@@ -209,7 +209,8 @@ namespace mediasoupclient
 		if (encodings && !encodings->empty())
 			transceiverInit.send_encodings = *encodings;
 
-		webrtc::RtpTransceiverInterface* transceiver = this->pc->AddTransceiver(track, transceiverInit);
+		rtc::scoped_refptr<webrtc::MediaStreamTrackInterface> scopedTrackRef(track);
+		webrtc::RtpTransceiverInterface *transceiver = this->pc->AddTransceiver(scopedTrackRef, transceiverInit).get();
 
 		if (!transceiver)
 			MSC_THROW_ERROR("error creating transceiver");
@@ -356,7 +357,7 @@ namespace mediasoupclient
 		SendResult sendResult;
 
 		sendResult.localId       = localId;
-		sendResult.rtpSender     = transceiver->sender();
+		sendResult.rtpSender     = transceiver->sender().get();
 		sendResult.rtpParameters = sendingRtpParameters;
 
 		return sendResult;
@@ -461,7 +462,7 @@ namespace mediasoupclient
 		auto* transceiver = locaIdIt->second;
 
 		transceiver->sender()->SetTrack(nullptr);
-		this->pc->RemoveTrack(transceiver->sender());
+		this->pc->RemoveTrack(transceiver->sender().get());
 		this->remoteSdp->CloseMediaSection(transceiver->mid().value());
 
 		// May throw.
@@ -749,9 +750,9 @@ namespace mediasoupclient
 
 		auto transceivers  = this->pc->GetTransceivers();
 		auto transceiverIt = std::find_if(
-		  transceivers.begin(),
-		  transceivers.end(),
-		  [&localId](webrtc::RtpTransceiverInterface* t) { return t->mid() == localId; });
+		  transceivers.begin(), transceivers.end(), [&localId](rtc::scoped_refptr<webrtc::RtpTransceiverInterface> &t) {
+			  return t->mid() == localId;
+		  });
 
 		if (transceiverIt == transceivers.end())
 			MSC_THROW_ERROR("new RTCRtpTransceiver not found");
@@ -759,13 +760,13 @@ namespace mediasoupclient
 		auto& transceiver = *transceiverIt;
 
 		// Store in the map.
-		this->mapMidTransceiver[localId] = transceiver;
+		this->mapMidTransceiver[localId] = transceiver.get();
 
 		RecvResult recvResult;
 
 		recvResult.localId     = localId;
-		recvResult.rtpReceiver = transceiver->receiver();
-		recvResult.track       = transceiver->receiver()->track();
+		recvResult.rtpReceiver = transceiver->receiver().get();
+		recvResult.track       = transceiver->receiver()->track().get();
 
 		return recvResult;
 	}
