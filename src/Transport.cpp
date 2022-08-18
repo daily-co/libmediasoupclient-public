@@ -178,6 +178,9 @@ namespace mediasoupclient
 	  const std::vector<webrtc::RtpEncodingParameters>* encodings,
 	  const json* codecOptions,
 	  const json* codec,
+	  const bool stopTracks,
+	  const bool zeroRtpOnPause,
+	  const bool disableTrackOnPause,
 	  const json& appData)
 	{
 		MSC_TRACE();
@@ -244,6 +247,9 @@ namespace mediasoupclient
 		  sendResult.rtpSender,
 		  track,
 		  sendResult.rtpParameters,
+		  stopTracks,
+		  zeroRtpOnPause,
+		  disableTrackOnPause,
 		  appData);
 
 		this->producers[producer->GetId()] = producer;

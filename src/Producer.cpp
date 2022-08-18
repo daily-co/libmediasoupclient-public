@@ -16,9 +16,13 @@ namespace mediasoupclient
 	  webrtc::RtpSenderInterface* rtpSender,
 	  webrtc::MediaStreamTrackInterface* track,
 	  const json& rtpParameters,
+	  const bool stopTracks,
+	  const bool zeroRtpOnPause,
+	  const bool disableTrackOnPause,
 	  const json& appData)
 	  : privateListener(privateListener), listener(listener), id(id), localId(localId),
-	    rtpSender(rtpSender), track(track), rtpParameters(rtpParameters), appData(appData)
+	    rtpSender(rtpSender), track(track), rtpParameters(rtpParameters), stopTracks(stopTracks),
+	    zeroRtpOnPause(zeroRtpOnPause), disableTrackOnPause(disableTrackOnPause), appData(appData)
 	{
 		MSC_TRACE();
 	}
@@ -132,9 +136,14 @@ namespace mediasoupclient
 
 		this->paused = true;
 
-		if (this->track != nullptr)
+		if (this->track != nullptr && this->disableTrackOnPause)
 		{
 			this->track->set_enabled(false);
+		}
+
+		if (this->zeroRtpOnPause)
+		{
+			this->privateListener->OnReplaceTrack(this, nullptr);
 		}
 	}
 
@@ -154,9 +163,14 @@ namespace mediasoupclient
 
 		this->paused = false;
 
-		if (this->track != nullptr)
+		if (this->track != nullptr && this->disableTrackOnPause)
 		{
 			this->track->set_enabled(true);
+		}
+
+		if (this->zeroRtpOnPause)
+		{
+			this->privateListener->OnReplaceTrack(this, this->track);
 		}
 	}
 
