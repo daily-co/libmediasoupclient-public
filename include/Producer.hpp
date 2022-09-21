@@ -93,7 +93,8 @@ namespace mediasoupclient
 		// Paused flag.
 		bool paused{ false };
 		// Video Max spatial layer.
-		uint8_t maxSpatialLayer{ 0 };
+		// NOTE(aleix) - we allow spatial layer 0 so initialize to something else
+		uint8_t maxSpatialLayer{ 255 };
 		// Stop tracks
 		// NOTE(jpgneves) - not actually implemented, as we can't stop the tracks
 		bool stopTracks{ false };
