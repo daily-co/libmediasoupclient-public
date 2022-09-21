@@ -542,21 +542,26 @@ namespace mediasoupclient
 		}
 
 		// Edit encodings.
-		if (spatialLayer == 1u)
+		// NOTE(aleix): We use spatial layers 0, 1 and 2. In mediasoup
+		// v3 layers can go from 0 to N, however it seems that
+		// libmediasoupclient is still using low, medium, high values
+		// (1, 2, 3) which where used in mediasoup v2.
+                // https://linear.app/dailyco/issue/CSDK-472/spatial-layers-mistmatch-between-libmediasoupclient-and-mediasoup
+		if (spatialLayer == 0)
 		{
 			hasLowEncoding && (lowEncoding->active = true);
 			hasMediumEncoding && (mediumEncoding->active = false);
 			hasHighEncoding && (highEncoding->active = false);
 		}
 
-		else if (spatialLayer == 2u)
+		else if (spatialLayer == 1u)
 		{
 			hasLowEncoding && (lowEncoding->active = true);
 			hasMediumEncoding && (mediumEncoding->active = true);
 			hasHighEncoding && (highEncoding->active = false);
 		}
 
-		else if (spatialLayer == 3u)
+		else if (spatialLayer == 2u)
 		{
 			hasLowEncoding && (lowEncoding->active = true);
 			hasMediumEncoding && (mediumEncoding->active = true);
