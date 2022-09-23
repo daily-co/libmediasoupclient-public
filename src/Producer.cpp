@@ -80,7 +80,7 @@ namespace mediasoupclient
 	{
 		MSC_TRACE();
 
-		return this->paused;
+		return this->paused || (this->track && !this->track->enabled());
 	}
 
 	uint8_t Producer::GetMaxSpatialLayer() const
