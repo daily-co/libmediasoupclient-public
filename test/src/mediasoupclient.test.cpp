@@ -191,7 +191,7 @@ TEST_CASE("mediasoupclient", "[mediasoupclient]")
 		/* clang-format on */
 
 		REQUIRE_NOTHROW(audioProducer.reset(
-		  sendTransport->Produce(&producerListener, audioTrack, nullptr, &codecOptions, appData)));
+		sendTransport->Produce(&producerListener, audioTrack, nullptr, &codecOptions, false, false, false, appData)));
 
 		REQUIRE(
 		  sendTransportListener.onConnectTimesCalled ==
@@ -211,7 +211,7 @@ TEST_CASE("mediasoupclient", "[mediasoupclient]")
 		REQUIRE(audioProducer->GetRtpSender() != nullptr);
 		REQUIRE(audioProducer->GetTrack() == audioTrack);
 		REQUIRE(audioProducer->IsPaused());
-		REQUIRE(audioProducer->GetMaxSpatialLayer() == 0);
+		REQUIRE(audioProducer->GetMaxSpatialLayer() == 255);
 		REQUIRE(audioProducer->GetAppData() == appData);
 		REQUIRE(audioProducer->GetRtpParameters()["codecs"].size() == 1);
 
@@ -235,7 +235,7 @@ TEST_CASE("mediasoupclient", "[mediasoupclient]")
 		audioProducer->Resume();
 
 		REQUIRE_NOTHROW(videoProducer.reset(
-		  sendTransport->Produce(&producerListener, videoTrack, &encodings, nullptr)));
+		sendTransport->Produce(&producerListener, videoTrack, &encodings, nullptr, false, false, false)));
 
 		REQUIRE(
 		  sendTransportListener.onConnectTimesCalled ==
@@ -305,7 +305,7 @@ TEST_CASE("mediasoupclient", "[mediasoupclient]")
 	SECTION("transport.produce() without track throws")
 	{
 		REQUIRE_THROWS_AS(
-		  sendTransport->Produce(&producerListener, nullptr, nullptr, nullptr), MediaSoupClientTypeError);
+		  sendTransport->Produce(&producerListener, nullptr, nullptr, nullptr, false, false, false), MediaSoupClientTypeError);
 	}
 
 	SECTION("transport.produceData() on transport without sctpParameters throws")
@@ -664,12 +664,13 @@ TEST_CASE("mediasoupclient", "[mediasoupclient]")
 		videoTrack = newVideoTrack;
 	}
 
-	SECTION("producer.ReplaceTrack() fails if null track is provided")
-	{
-		REQUIRE_THROWS_AS(
-			videoProducer->ReplaceTrack(nullptr),
-			MediaSoupClientError);
-	}
+	// NOTE(aleix): We now allow null tracks.
+	// SECTION("producer.ReplaceTrack() fails if null track is provided")
+	// {
+	// 	REQUIRE_THROWS_AS(
+	// 		videoProducer->ReplaceTrack(nullptr),
+	// 		MediaSoupClientError);
+	// }
 
 	SECTION("producer.SetMaxSpatialLayer() succeeds")
 	{
@@ -766,7 +767,7 @@ TEST_CASE("mediasoupclient", "[mediasoupclient]")
 		REQUIRE_THROWS_AS(
 			sendTransport->Produce(
 				&producerListener,
-				audioTrack, nullptr, nullptr),
+				audioTrack, nullptr, nullptr, false, false, false),
 			MediaSoupClientError);
 	}
 
