@@ -589,45 +589,10 @@ namespace mediasoupclient
 		auto* transceiver = localIdIt->second;
 		auto parameters   = transceiver->sender()->GetParameters();
 
-		bool hasLowEncoding{ false };
-		bool hasMediumEncoding{ false };
-		bool hasHighEncoding{ false };
-		webrtc::RtpEncodingParameters* lowEncoding{ nullptr };
-		webrtc::RtpEncodingParameters* mediumEncoding{ nullptr };
-		webrtc::RtpEncodingParameters* highEncoding{ nullptr };
-
-		if (!parameters.encodings.empty())
-		{
-			hasLowEncoding = true;
-			lowEncoding    = &parameters.encodings[0];
-		}
-
-		if (parameters.encodings.size() > 1)
-		{
-			hasMediumEncoding = true;
-			mediumEncoding    = &parameters.encodings[1];
-		}
-
-		if (parameters.encodings.size() > 2)
-		{
-			hasHighEncoding = true;
-			highEncoding    = &parameters.encodings[2];
-		}
-
 		// Edit encodings.
-		if (!encodings.empty())
+		for (int i = 0; i < parameters.encodings.size() && i < encodings.size(); i++)
 		{
-			lowEncoding = &encodings[0];
-		}
-
-		if (encodings.size() > 1)
-		{
-			mediumEncoding = &encodings[1];
-		}
-
-		if (encodings.size() > 2)
-		{
-			highEncoding = &encodings[2];
+			parameters.encodings[i] = encodings[i];
 		}
 
 		auto result = transceiver->sender()->SetParameters(parameters);
