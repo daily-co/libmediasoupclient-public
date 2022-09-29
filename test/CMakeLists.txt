@@ -52,6 +52,12 @@ if(UNIX)
 	target_link_libraries(test_mediasoupclient PRIVATE Threads::Threads)
 endif(UNIX)
 
+# NOTE(aleix): This is so we can link tests in Linux using libwebrtc built as
+# explained in https://mediasoup.org/documentation/v3/libmediasoupclient/installation/
+if(UNIX AND NOT APPLE)
+	target_link_libraries(test_mediasoupclient PRIVATE glib-2.0 X11)
+endif()
+
 # Private dependencies.
 target_link_libraries(test_mediasoupclient PRIVATE mediasoupclient)
 target_link_libraries(test_mediasoupclient PRIVATE ${CMAKE_DL_LIBS})
