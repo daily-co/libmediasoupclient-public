@@ -194,10 +194,10 @@ namespace mediasoupclient
 			return;
 		}
 
+		auto paused = IsPaused();
+
 		// May throw.
 		this->privateListener->OnReplaceTrack(this, track);
-
-		auto paused = IsPaused();
 
 		// Set the new track.
 		this->track = track;
