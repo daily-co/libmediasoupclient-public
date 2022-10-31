@@ -539,7 +539,15 @@ namespace mediasoupclient
 		// Edit encodings.
 		for (int i = 0; i < parameters.encodings.size() && i < encodings.size(); i++)
 		{
+			auto oldEncoding        = parameters.encodings[i];
 			parameters.encodings[i] = encodings[i];
+			// There are a couple of parameters that we are not allowed to change
+			// So we need to preserve these parameters before we change the encoding
+			// More info can be found inside webrtc, media_engine.cc =>
+			// CheckRtpParametersInvalidModificationAndValues
+			parameters.encodings[i].rid    = oldEncoding.rid;
+			parameters.encodings[i].ssrc   = oldEncoding.ssrc;
+			parameters.encodings[i].active = oldEncoding.active;
 		}
 
 		auto result = transceiver->sender()->SetParameters(parameters);
