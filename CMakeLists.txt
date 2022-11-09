@@ -93,6 +93,9 @@ set(
 # Create target.
 add_library(${PROJECT_NAME} STATIC ${SOURCE_FILES})
 
+# Disable bitcode.
+set_target_properties(${PROJECT_NAME} PROPERTIES XCODE_ATTRIBUTE_ENABLE_BITCODE "NO")
+
 if(${MEDIASOUPCLIENT_LOG_TRACE})
 	target_compile_definitions(${PROJECT_NAME}
 		PRIVATE MSC_LOG_TRACE=1
