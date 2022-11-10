@@ -590,7 +590,7 @@ namespace mediasoupclient
 		auto parameters   = transceiver->sender()->GetParameters();
 
 		// Edit encodings.
-		for (int i = 0; i < parameters.encodings.size() && i < encodings.size(); i++)
+		for (size_t i = 0; i < parameters.encodings.size() && i < encodings.size(); i++)
 		{
 			auto oldEncoding        = parameters.encodings[i];
 			parameters.encodings[i] = encodings[i];
