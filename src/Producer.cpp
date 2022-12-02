@@ -80,7 +80,10 @@ namespace mediasoupclient
 	{
 		MSC_TRACE();
 
-		return this->paused || (this->track && !this->track->enabled());
+		// NOTE: this should only reflect the Producer's state,
+		// not the track's, as the track's enable state might be managed
+		// externally (indicated by disableTrackOnPause == false)
+		return this->paused;
 	}
 
 	uint8_t Producer::GetMaxSpatialLayer() const
@@ -204,7 +207,7 @@ namespace mediasoupclient
 
 		// If this Producer was paused/resumed and the state of the new
 		// track does not match, fix it.
-		if (this->track != nullptr)
+		if (this->track != nullptr && this->disableTrackOnPause)
 		{
 			if (!paused)
 				this->track->set_enabled(true);
