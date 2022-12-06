@@ -7,7 +7,6 @@
 #include "ortc.hpp"
 #include "scalabilityMode.hpp"
 #include "sdptransform.hpp"
-#include "scalabilityMode.hpp"
 #include "sdp/Utils.hpp"
 #include <cinttypes> // PRIu64, etc
 
@@ -211,7 +210,8 @@ namespace mediasoupclient
 			transceiverInit.send_encodings = *encodings;
 
 		rtc::scoped_refptr<webrtc::MediaStreamTrackInterface> scopedTrackRef(track);
-		webrtc::RtpTransceiverInterface *transceiver = this->pc->AddTransceiver(scopedTrackRef, transceiverInit).get();
+		webrtc::RtpTransceiverInterface* transceiver =
+		  this->pc->AddTransceiver(scopedTrackRef, transceiverInit).get();
 
 		if (!transceiver)
 			MSC_THROW_ERROR("error creating transceiver");
@@ -254,33 +254,6 @@ namespace mediasoupclient
 
 				hackVp9Svc             = true;
 				localSdpObject         = sdptransform::parse(offer);
-				json& offerMediaObject = localSdpObject["media"][mediaSectionIdx.idx];
-
-				Sdp::Utils::addLegacySimulcast(offerMediaObject, spatialLayers);
-
-				offer = sdptransform::write(localSdpObject);
-			}
-
-			std::string scalability_mode =
-			  encodings && encodings->size()
-			    ? ((*encodings)[0].scalability_mode.has_value() ? (*encodings)[0].scalability_mode.value()
-			                                                    : "")
-			    : "";
-
-			const json& layers = parseScalabilityMode(scalability_mode);
-
-			auto spatialLayers = layers["spatialLayers"].get<int>();
-
-			auto mimeType = sendingRtpParameters["codecs"][0]["mimeType"].get<std::string>();
-
-			std::transform(mimeType.begin(), mimeType.end(), mimeType.begin(), ::tolower);
-
-			if (encodings && encodings->size() == 1 && spatialLayers > 1 && mimeType == "video/vp9")
-			{
-				MSC_DEBUG("send() | enabling legacy simulcast for VP9 SVC");
-
-				hackVp9Svc       = true;
-				localSdpObject   = sdptransform::parse(offer);
 				json& offerMediaObject = localSdpObject["media"][mediaSectionIdx.idx];
 
 				Sdp::Utils::addLegacySimulcast(offerMediaObject, spatialLayers);
@@ -575,7 +548,7 @@ namespace mediasoupclient
 		// v3 layers can go from 0 to N, however it seems that
 		// libmediasoupclient is still using low, medium, high values
 		// (1, 2, 3) which where used in mediasoup v2.
-                // https://linear.app/dailyco/issue/CSDK-472/spatial-layers-mistmatch-between-libmediasoupclient-and-mediasoup
+		// https://linear.app/dailyco/issue/CSDK-472/spatial-layers-mistmatch-between-libmediasoupclient-and-mediasoup
 		if (spatialLayer == 0)
 		{
 			hasLowEncoding && (lowEncoding->active = true);
@@ -756,9 +729,10 @@ namespace mediasoupclient
 
 		auto transceivers  = this->pc->GetTransceivers();
 		auto transceiverIt = std::find_if(
-		  transceivers.begin(), transceivers.end(), [&localId](rtc::scoped_refptr<webrtc::RtpTransceiverInterface> &t) {
-			  return t->mid() == localId;
-		  });
+		  transceivers.begin(),
+		  transceivers.end(),
+		  [&localId](rtc::scoped_refptr<webrtc::RtpTransceiverInterface>& t)
+		  { return t->mid() == localId; });
 
 		if (transceiverIt == transceivers.end())
 			MSC_THROW_ERROR("new RTCRtpTransceiver not found");
