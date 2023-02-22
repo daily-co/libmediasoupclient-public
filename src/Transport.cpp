@@ -196,6 +196,8 @@ namespace mediasoupclient
 
 		if (codecOptions)
 			ortc::validateProducerCodecOptions(const_cast<json&>(*codecOptions));
+                if (codec)
+			ortc::validateRtpCodecCapability(const_cast<json&>(*codec));
 
 		std::string producerId;
 		std::vector<webrtc::RtpEncodingParameters> normalizedEncodings;
