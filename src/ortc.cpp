@@ -1279,7 +1279,8 @@ namespace mediasoupclient
 				}
 
 				// NOTE: We assume a single media codec plus an optional RTX codec.
-				break;
+				// NOTE(aleix): Let's not assume that so we can use different codecs.
+				//break;
 			}
 
 			for (const auto& extendedExtension : extendedRtpCapabilities["headerExtensions"])
@@ -1373,7 +1374,8 @@ namespace mediasoupclient
 				}
 
 				// NOTE: We assume a single media codec plus an optional RTX codec.
-				break;
+				// NOTE(aleix): Let's not assume that so we can use different codecs.
+				//break;
 			}
 
 			for (const auto& extendedExtension : extendedRtpCapabilities["headerExtensions"])
