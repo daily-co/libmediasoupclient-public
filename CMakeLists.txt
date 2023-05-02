@@ -8,19 +8,19 @@ set(mediasoupclient_VERSION_MINOR 4)
 set(mediasoupclient_VERSION_PATCH 0)
 
 # Configure a header file to pass the version.
-configure_file (
+configure_file(
 	"${PROJECT_SOURCE_DIR}/version.hpp.in"
 	"${PROJECT_SOURCE_DIR}/include/version.hpp"
 )
 
 # C++ standard requirements.
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Project options.
 option(MEDIASOUPCLIENT_BUILD_TESTS "Build unit tests" OFF)
-option(MEDIASOUPCLIENT_LOG_TRACE   "Enable MSC_LOG_TRACE (See Logger.hpp)" OFF)
-option(MEDIASOUPCLIENT_LOG_DEV     "Enable MSC_LOG_DEV (See Logger.hpp)" OFF)
+option(MEDIASOUPCLIENT_LOG_TRACE "Enable MSC_LOG_TRACE (See Logger.hpp)" OFF)
+option(MEDIASOUPCLIENT_LOG_DEV "Enable MSC_LOG_DEV (See Logger.hpp)" OFF)
 
 # Project configuration.
 set(LIBWEBRTC_INCLUDE_PATH "" CACHE STRING "libwebrtc include path")
@@ -44,12 +44,12 @@ message("")
 
 # GCC >= 4.9 is required due to std::regex use.
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-	if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.9)
+	if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.9)
 		message(FATAL_ERROR "GCC version must be at least 4.9!")
 	endif()
 endif()
 
-if (${MEDIASOUPCLIENT_BUILD_TESTS})
+if(${MEDIASOUPCLIENT_BUILD_TESTS})
 	add_subdirectory(test)
 endif()
 
@@ -92,6 +92,9 @@ set(
 
 # Create target.
 add_library(${PROJECT_NAME} STATIC ${SOURCE_FILES})
+
+# Disable bitcode.
+set_target_properties(${PROJECT_NAME} PROPERTIES XCODE_ATTRIBUTE_ENABLE_BITCODE "NO")
 
 if(${MEDIASOUPCLIENT_LOG_TRACE})
 	target_compile_definitions(${PROJECT_NAME}

@@ -7852,7 +7852,14 @@ namespace Catch {
 
 #ifdef CATCH_PLATFORM_MAC
 
-    #define CATCH_TRAP() __asm__("int $3\n" : : ) /* NOLINT */
+    #if defined(__i386__) || defined(__x86_64__)
+        #define CATCH_TRAP() __asm__("int $3\n" : : ) /* NOLINT */
+    #elif defined(__aarch64__)
+        #define CATCH_TRAP() __asm__(".inst 0xd43e0000")
+    #elif defined(__POWERPC__)
+        #define CATCH_TRAP() __asm__("li r0, 20\nsc\nnop\nli r0, 37\nli r4, 2\nsc\nnop\n" \
+        : : : "memory","r0","r3","r4" ) /* NOLINT */
+    #endif
 
 #elif defined(CATCH_PLATFORM_LINUX)
     // If we can use inline assembler, do it because this allows us to break
@@ -17594,4 +17601,3 @@ using Catch::Detail::Approx;
 // end catch_reenable_warnings.h
 // end catch.hpp
 #endif // TWOBLUECUBES_SINGLE_INCLUDE_CATCH_HPP_INCLUDED
-

@@ -16,9 +16,13 @@ namespace mediasoupclient
 	  webrtc::RtpSenderInterface* rtpSender,
 	  webrtc::MediaStreamTrackInterface* track,
 	  const json& rtpParameters,
+	  const bool stopTracks,
+	  const bool zeroRtpOnPause,
+	  const bool disableTrackOnPause,
 	  const json& appData)
 	  : privateListener(privateListener), listener(listener), id(id), localId(localId),
-	    rtpSender(rtpSender), track(track), rtpParameters(rtpParameters), appData(appData)
+	    rtpSender(rtpSender), track(track), rtpParameters(rtpParameters), stopTracks(stopTracks),
+	    zeroRtpOnPause(zeroRtpOnPause), disableTrackOnPause(disableTrackOnPause), appData(appData)
 	{
 		MSC_TRACE();
 	}
@@ -76,7 +80,10 @@ namespace mediasoupclient
 	{
 		MSC_TRACE();
 
-		return !this->track->enabled();
+		// NOTE: this should only reflect the Producer's state,
+		// not the track's, as the track's enable state might be managed
+		// externally (indicated by disableTrackOnPause == false)
+		return this->paused;
 	}
 
 	uint8_t Producer::GetMaxSpatialLayer() const
@@ -130,7 +137,17 @@ namespace mediasoupclient
 			return;
 		}
 
-		this->track->set_enabled(false);
+		this->paused = true;
+
+		if (this->track != nullptr && this->disableTrackOnPause)
+		{
+			this->track->set_enabled(false);
+		}
+
+		if (this->zeroRtpOnPause)
+		{
+			this->privateListener->OnReplaceTrack(this, nullptr);
+		}
 	}
 
 	/**
@@ -147,7 +164,17 @@ namespace mediasoupclient
 			return;
 		}
 
-		this->track->set_enabled(true);
+		this->paused = false;
+
+		if (this->track != nullptr && this->disableTrackOnPause)
+		{
+			this->track->set_enabled(true);
+		}
+
+		if (this->zeroRtpOnPause)
+		{
+			this->privateListener->OnReplaceTrack(this, this->track);
+		}
 	}
 
 	/**
@@ -159,9 +186,7 @@ namespace mediasoupclient
 
 		if (this->closed)
 			MSC_THROW_INVALID_STATE_ERROR("Producer closed");
-		else if (track == nullptr)
-			MSC_THROW_TYPE_ERROR("missing track");
-		else if (track->state() == webrtc::MediaStreamTrackInterface::TrackState::kEnded)
+		else if (track && track->state() == webrtc::MediaStreamTrackInterface::TrackState::kEnded)
 			MSC_THROW_INVALID_STATE_ERROR("track ended");
 
 		// Do nothing if this is the same track as the current handled one.
@@ -172,21 +197,23 @@ namespace mediasoupclient
 			return;
 		}
 
+		auto paused = IsPaused();
+
 		// May throw.
 		this->privateListener->OnReplaceTrack(this, track);
-
-		// Keep current paused state.
-		auto paused = IsPaused();
 
 		// Set the new track.
 		this->track = track;
 
 		// If this Producer was paused/resumed and the state of the new
 		// track does not match, fix it.
-		if (!paused)
-			this->track->set_enabled(true);
-		else
-			this->track->set_enabled(false);
+		if (this->track != nullptr && this->disableTrackOnPause)
+		{
+			if (!paused)
+				this->track->set_enabled(true);
+			else
+				this->track->set_enabled(false);
+		}
 	}
 
 	/**
@@ -208,6 +235,21 @@ namespace mediasoupclient
 		this->privateListener->OnSetMaxSpatialLayer(this, spatialLayer);
 
 		this->maxSpatialLayer = spatialLayer;
+	}
+
+	/**
+	 * Sets the RTP encoding parameters for this producer.
+	 */
+	void Producer::SetRtpEncodingParameters(std::vector<webrtc::RtpEncodingParameters> parameters)
+	{
+		MSC_TRACE();
+
+		if (this->closed)
+			MSC_THROW_INVALID_STATE_ERROR("Producer close");
+		else if (this->track->kind() != "video")
+			MSC_THROW_TYPE_ERROR("not a video Producer");
+
+		this->privateListener->OnSetRtpEncodingParameters(this, parameters);
 	}
 
 	/**

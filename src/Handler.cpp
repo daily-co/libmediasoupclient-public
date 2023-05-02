@@ -209,7 +209,9 @@ namespace mediasoupclient
 		if (encodings && !encodings->empty())
 			transceiverInit.send_encodings = *encodings;
 
-		webrtc::RtpTransceiverInterface* transceiver = this->pc->AddTransceiver(track, transceiverInit);
+		rtc::scoped_refptr<webrtc::MediaStreamTrackInterface> scopedTrackRef(track);
+		webrtc::RtpTransceiverInterface* transceiver =
+		  this->pc->AddTransceiver(scopedTrackRef, transceiverInit).get();
 
 		if (!transceiver)
 			MSC_THROW_ERROR("error creating transceiver");
@@ -356,7 +358,7 @@ namespace mediasoupclient
 		SendResult sendResult;
 
 		sendResult.localId       = localId;
-		sendResult.rtpSender     = transceiver->sender();
+		sendResult.rtpSender     = transceiver->sender().get();
 		sendResult.rtpParameters = sendingRtpParameters;
 
 		return sendResult;
@@ -410,10 +412,10 @@ namespace mediasoupclient
 			const Sdp::RemoteSdp::MediaSectionIdx mediaSectionIdx =
 			  this->remoteSdp->GetNextMediaSectionIdx();
 
-			auto offerMediaObject =
-			  find_if(localSdpObject["media"].begin(), localSdpObject["media"].end(), [](const json& m) {
-				  return m.at("type").get<std::string>() == "application";
-			  });
+			auto offerMediaObject = find_if(
+			  localSdpObject["media"].begin(),
+			  localSdpObject["media"].end(),
+			  [](const json& m) { return m.at("type").get<std::string>() == "application"; });
 
 			if (offerMediaObject == localSdpObject["media"].end())
 			{
@@ -461,7 +463,7 @@ namespace mediasoupclient
 		auto* transceiver = locaIdIt->second;
 
 		transceiver->sender()->SetTrack(nullptr);
-		this->pc->RemoveTrack(transceiver->sender());
+		this->pc->RemoveTrack(transceiver->sender().get());
 		this->remoteSdp->CloseMediaSection(transceiver->mid().value());
 
 		// May throw.
@@ -542,10 +544,22 @@ namespace mediasoupclient
 		}
 
 		// Edit encodings.
-		if (spatialLayer == 1u)
+		// NOTE(aleix): We use spatial layers 0, 1 and 2. In mediasoup
+		// v3 layers can go from 0 to N, however it seems that
+		// libmediasoupclient is still using low, medium, high values
+		// (1, 2, 3) which where used in mediasoup v2.
+		// https://linear.app/dailyco/issue/CSDK-472/spatial-layers-mistmatch-between-libmediasoupclient-and-mediasoup
+		if (spatialLayer == 0)
 		{
 			hasLowEncoding && (lowEncoding->active = true);
 			hasMediumEncoding && (mediumEncoding->active = false);
+			hasHighEncoding && (highEncoding->active = false);
+		}
+
+		else if (spatialLayer == 1u)
+		{
+			hasLowEncoding && (lowEncoding->active = true);
+			hasMediumEncoding && (mediumEncoding->active = true);
 			hasHighEncoding && (highEncoding->active = false);
 		}
 
@@ -553,14 +567,42 @@ namespace mediasoupclient
 		{
 			hasLowEncoding && (lowEncoding->active = true);
 			hasMediumEncoding && (mediumEncoding->active = true);
-			hasHighEncoding && (highEncoding->active = false);
+			hasHighEncoding && (highEncoding->active = true);
 		}
 
-		else if (spatialLayer == 3u)
+		auto result = transceiver->sender()->SetParameters(parameters);
+
+		if (!result.ok())
+			MSC_THROW_ERROR("%s", result.message());
+	}
+
+	void SendHandler::SetRtpEncodingParameters(
+	  const std::string& localId, std::vector<webrtc::RtpEncodingParameters> encodings)
+	{
+		MSC_TRACE();
+
+		MSC_DEBUG("[localId:%s]", localId.c_str());
+
+		auto localIdIt = this->mapMidTransceiver.find(localId);
+
+		if (localIdIt == this->mapMidTransceiver.end())
+			MSC_THROW_ERROR("associated RtpTransceiver not found");
+
+		auto* transceiver = localIdIt->second;
+		auto parameters   = transceiver->sender()->GetParameters();
+
+		// Edit encodings.
+		for (size_t i = 0; i < parameters.encodings.size() && i < encodings.size(); i++)
 		{
-			hasLowEncoding && (lowEncoding->active = true);
-			hasMediumEncoding && (mediumEncoding->active = true);
-			hasHighEncoding && (highEncoding->active = true);
+			auto oldEncoding        = parameters.encodings[i];
+			parameters.encodings[i] = encodings[i];
+			// There are a couple of parameters that we are not allowed to change
+			// So we need to preserve these parameters before we change the encoding
+			// More info can be found inside webrtc, media_engine.cc =>
+			// CheckRtpParametersInvalidModificationAndValues
+			parameters.encodings[i].rid    = oldEncoding.rid;
+			parameters.encodings[i].ssrc   = oldEncoding.ssrc;
+			parameters.encodings[i].active = oldEncoding.active;
 		}
 
 		auto result = transceiver->sender()->SetParameters(parameters);
@@ -664,9 +706,9 @@ namespace mediasoupclient
 		auto answer         = this->pc->CreateAnswer(options);
 		auto localSdpObject = sdptransform::parse(answer);
 		auto mediaIt        = find_if(
-      localSdpObject["media"].begin(), localSdpObject["media"].end(), [&localId](const json& m) {
-        return m["mid"].get<std::string>() == localId;
-      });
+      localSdpObject["media"].begin(),
+      localSdpObject["media"].end(),
+      [&localId](const json& m) { return m["mid"].get<std::string>() == localId; });
 
 		auto& answerMediaObject = *mediaIt;
 
@@ -687,9 +729,10 @@ namespace mediasoupclient
 
 		auto transceivers  = this->pc->GetTransceivers();
 		auto transceiverIt = std::find_if(
-		  transceivers.begin(), transceivers.end(), [&localId](webrtc::RtpTransceiverInterface* t) {
-			  return t->mid() == localId;
-		  });
+		  transceivers.begin(),
+		  transceivers.end(),
+		  [&localId](rtc::scoped_refptr<webrtc::RtpTransceiverInterface>& t)
+		  { return t->mid() == localId; });
 
 		if (transceiverIt == transceivers.end())
 			MSC_THROW_ERROR("new RTCRtpTransceiver not found");
@@ -697,13 +740,13 @@ namespace mediasoupclient
 		auto& transceiver = *transceiverIt;
 
 		// Store in the map.
-		this->mapMidTransceiver[localId] = transceiver;
+		this->mapMidTransceiver[localId] = transceiver.get();
 
 		RecvResult recvResult;
 
 		recvResult.localId     = localId;
-		recvResult.rtpReceiver = transceiver->receiver();
-		recvResult.track       = transceiver->receiver()->track();
+		recvResult.rtpReceiver = transceiver->receiver().get();
+		recvResult.track       = transceiver->receiver()->track().get();
 
 		return recvResult;
 	}

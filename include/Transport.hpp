@@ -133,6 +133,9 @@ namespace mediasoupclient
 		  const std::vector<webrtc::RtpEncodingParameters>* encodings,
 		  const nlohmann::json* codecOptions,
 		  const nlohmann::json* codec,
+		  const bool stopTracks,
+		  const bool zeroRtpOnPause,
+		  const bool disableTrackOnPause,
 		  const nlohmann::json& appData = nlohmann::json::object());
 
 		DataProducer* ProduceData(
@@ -154,6 +157,8 @@ namespace mediasoupclient
 		void OnClose(DataProducer* dataProducer) override;
 		void OnReplaceTrack(const Producer* producer, webrtc::MediaStreamTrackInterface* track) override;
 		void OnSetMaxSpatialLayer(const Producer* producer, uint8_t maxSpatialLayer) override;
+		void OnSetRtpEncodingParameters(
+		  const Producer* producer, std::vector<webrtc::RtpEncodingParameters> encodings) override;
 		nlohmann::json OnGetStats(const Producer* producer) override;
 
 	private:
