@@ -1,20 +1,20 @@
 set(
-    SOURCE_FILES
-    src/Device.test.cpp
-    src/Handler.test.cpp
-    src/PeerConnection.test.cpp
-    src/RemoteSdp.test.cpp
-    src/SdpUtils.test.cpp
-    src/mediasoupclient.test.cpp
-    src/MediaStreamTrackFactory.cpp
-    src/ortc.test.cpp
-    src/fakeParameters.cpp
-    src/scalabilityMode.test.cpp
-    src/tests.cpp
-    include/FakeTransportListener.hpp
-    include/MediaStreamTrackFactory.hpp
-    include/helpers.hpp
-    include/fakeParameters.hpp
+	SOURCE_FILES
+	src/Device.test.cpp
+	src/Handler.test.cpp
+	src/PeerConnection.test.cpp
+	src/RemoteSdp.test.cpp
+	src/SdpUtils.test.cpp
+	src/mediasoupclient.test.cpp
+	src/MediaStreamTrackFactory.cpp
+	src/ortc.test.cpp
+	src/fakeParameters.cpp
+	src/scalabilityMode.test.cpp
+	src/tests.cpp
+	include/FakeTransportListener.hpp
+	include/MediaStreamTrackFactory.hpp
+	include/helpers.hpp
+	include/fakeParameters.hpp
 )
 
 # Create target.
@@ -22,51 +22,46 @@ add_executable(test_mediasoupclient ${SOURCE_FILES})
 
 # Private (implementation) header files.
 target_include_directories(test_mediasoupclient PRIVATE
-    include
-    ${mediasoupclient_SOURCE_DIR}/include
-    ${mediasoupclient_SOURCE_DIR}/deps/catch/single_include/catch2
+	include
+	${mediasoupclient_SOURCE_DIR}/include
+	${mediasoupclient_SOURCE_DIR}/deps/catch/single_include/catch2
 )
 
 if(APPLE)
-    find_library(APPLICATION_SERVICES ApplicationServices)
-    find_library(AUDIO_TOOLBOX AudioToolbox)
-    find_library(CORE_AUDIO CoreAudio)
-    find_library(CORE_FOUNDATION Foundation)
+	find_library(APPLICATION_SERVICES ApplicationServices)
+	find_library(AUDIO_TOOLBOX AudioToolbox)
+	find_library(CORE_AUDIO CoreAudio)
+	find_library(CORE_FOUNDATION Foundation)
 
-    target_link_libraries(test_mediasoupclient PRIVATE
-        ${APPLICATION_SERVICES}
-        ${AUDIO_TOOLBOX}
-        ${CORE_AUDIO}
-        ${CORE_FOUNDATION}
-    )
+	target_link_libraries(test_mediasoupclient PRIVATE
+		${APPLICATION_SERVICES}
+		${AUDIO_TOOLBOX}
+		${CORE_AUDIO}
+		${CORE_FOUNDATION}
+	)
 
-    # Bundle it.
-    set_target_properties(test_mediasoupclient PROPERTIES
-        MACOSX_BUNDLE TRUE
-        MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/Info.plist
-    )
+	# Bundle it.
+	set_target_properties(test_mediasoupclient PROPERTIES
+		MACOSX_BUNDLE TRUE
+		MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/Info.plist
+	)
 endif(APPLE)
 
 if(UNIX)
-    find_package(Threads REQUIRED)
-    target_link_libraries(test_mediasoupclient PRIVATE Threads::Threads)
+	find_package(Threads REQUIRED)
+	target_link_libraries(test_mediasoupclient PRIVATE Threads::Threads)
 endif(UNIX)
 
 target_compile_definitions(test_mediasoupclient PUBLIC
-    $<$<PLATFORM_ID:Windows>:NOMINMAX>
-    $<$<PLATFORM_ID:Windows>:WIN32_LEAN_AND_MEAN>
+	$<$<PLATFORM_ID:Windows>:NOMINMAX>
+	$<$<PLATFORM_ID:Windows>:WIN32_LEAN_AND_MEAN>
 )
 
 # NOTE(aleix): This is so we can link tests in Linux using libwebrtc built as
 # explained in https://mediasoup.org/documentation/v3/libmediasoupclient/installation/
 if(UNIX AND NOT APPLE)
-    target_link_libraries(test_mediasoupclient PRIVATE glib-2.0 X11)
+	target_link_libraries(test_mediasoupclient PRIVATE glib-2.0 X11)
 endif()
-
-target_compile_definitions(test_mediasoupclient PUBLIC
-    $<$<PLATFORM_ID:Windows>:NOMINMAX>
-    $<$<PLATFORM_ID:Windows>:WIN32_LEAN_AND_MEAN>
-)
 
 # Private dependencies.
 target_link_libraries(test_mediasoupclient PRIVATE mediasoupclient)
@@ -77,5 +72,5 @@ add_subdirectory(deps/libwebrtc "${CMAKE_CURRENT_BINARY_DIR}/libwebrtc")
 
 # Public (interface) dependencies.
 target_link_libraries(test_mediasoupclient PUBLIC
-    webrtc
+	webrtc
 )

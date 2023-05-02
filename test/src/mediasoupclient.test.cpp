@@ -191,7 +191,7 @@ TEST_CASE("mediasoupclient", "[mediasoupclient]")
 		/* clang-format on */
 
 		REQUIRE_NOTHROW(audioProducer.reset(sendTransport->Produce(
-		  &producerListener, audioTrack, nullptr, &codecOptions, nullptr, false, false, false, appData)));
+		  &producerListener, audioTrack.release(), nullptr, &codecOptions, nullptr, false, false, false, appData)));
 
 		REQUIRE(
 		  sendTransportListener.onConnectTimesCalled ==
@@ -235,7 +235,7 @@ TEST_CASE("mediasoupclient", "[mediasoupclient]")
 		audioProducer->Resume();
 
 		REQUIRE_NOTHROW(videoProducer.reset(sendTransport->Produce(
-		  &producerListener, videoTrack, &encodings, nullptr, false, false, false, nullptr)));
+		  &producerListener, videoTrack.release(), &encodings, nullptr, nullptr, false, false, false, nullptr)));
 
 		REQUIRE(
 		  sendTransportListener.onConnectTimesCalled ==
@@ -306,7 +306,7 @@ TEST_CASE("mediasoupclient", "[mediasoupclient]")
 	{
 		REQUIRE_THROWS_AS(
 		  sendTransport->Produce(
-		    &producerListener, nullptr, nullptr, nullptr, false, false, false, nullptr),
+		    &producerListener, nullptr, nullptr, nullptr, nullptr, false, false, false, nullptr),
 		  MediaSoupClientTypeError);
 	}
 
@@ -648,7 +648,7 @@ TEST_CASE("mediasoupclient", "[mediasoupclient]")
 
 		auto newAudioTrack = createAudioTrack("audio-track-id-2");
 
-		REQUIRE_NOTHROW(audioProducer->ReplaceTrack(newAudioTrack));
+		REQUIRE_NOTHROW(audioProducer->ReplaceTrack(newAudioTrack.release()));
 		REQUIRE(audioProducer->GetTrack() == newAudioTrack);
 		// Producer was already paused.
 		REQUIRE(audioProducer->IsPaused());
@@ -658,7 +658,7 @@ TEST_CASE("mediasoupclient", "[mediasoupclient]")
 
 		auto newVideoTrack = createVideoTrack("video-track-id-2");
 
-		REQUIRE_NOTHROW(videoProducer->ReplaceTrack(newVideoTrack));
+		REQUIRE_NOTHROW(videoProducer->ReplaceTrack(newVideoTrack.release()));
 		REQUIRE(videoProducer->GetTrack() == newVideoTrack);
 		REQUIRE(!videoProducer->IsPaused());
 
@@ -769,7 +769,7 @@ TEST_CASE("mediasoupclient", "[mediasoupclient]")
 		REQUIRE_THROWS_AS(
 			sendTransport->Produce(
 				&producerListener,
-				audioTrack, nullptr,  nullptr, false, false, false, nullptr),
+				audioTrack.release(), nullptr, nullptr, nullptr, false, false, false, nullptr),
 			MediaSoupClientError);
 	}
 
