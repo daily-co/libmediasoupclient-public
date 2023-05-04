@@ -169,7 +169,15 @@ namespace mediasoupclient
 		MSC_TRACE();
 
 		return Device::CreateSendTransport(
-		  listener, id, iceParameters, iceCandidates, dtlsParameters, nullptr, peerConnectionOptions, appData);
+		  listener,
+		  id,
+		  iceParameters,
+		  iceCandidates,
+		  dtlsParameters,
+		  iceServers,
+		  nullptr,
+		  peerConnectionOptions,
+		  appData);
 	}
 
 	RecvTransport* Device::CreateRecvTransport(
