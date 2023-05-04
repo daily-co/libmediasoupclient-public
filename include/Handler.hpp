@@ -44,8 +44,9 @@ namespace mediasoupclient
 		  const nlohmann::json& iceParameters,
 		  const nlohmann::json& iceCandidates,
 		  const nlohmann::json& dtlsParameters,
+		  const nlohmann::json& iceServers,
 		  const nlohmann::json& sctpParameters,
-		  const PeerConnection::Options* peerConnectionOptions);
+		  PeerConnection::Options* peerConnectionOptions);
 
 	public:
 		void Close();
@@ -94,8 +95,9 @@ namespace mediasoupclient
 		  const nlohmann::json& iceParameters,
 		  const nlohmann::json& iceCandidates,
 		  const nlohmann::json& dtlsParameters,
+		  const nlohmann::json& iceServers,
 		  const nlohmann::json& sctpParameters,
-		  const PeerConnection::Options* peerConnectionOptions,
+		  PeerConnection::Options* peerConnectionOptions,
 		  const nlohmann::json& sendingRtpParametersByKind,
 		  const nlohmann::json& sendingRemoteRtpParametersByKind = nlohmann::json());
 
@@ -138,8 +140,9 @@ namespace mediasoupclient
 		  const nlohmann::json& iceParameters,
 		  const nlohmann::json& iceCandidates,
 		  const nlohmann::json& dtlsParameters,
+		  const nlohmann::json& iceServers,
 		  const nlohmann::json& sctpParameters,
-		  const PeerConnection::Options* peerConnectionOptions);
+		  PeerConnection::Options* peerConnectionOptions);
 
 		RecvResult Receive(
 		  const std::string& id, const std::string& kind, const nlohmann::json* rtpParameters);

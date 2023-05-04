@@ -126,8 +126,9 @@ namespace mediasoupclient
 	  const json& iceParameters,
 	  const json& iceCandidates,
 	  const json& dtlsParameters,
+	  const json& iceServers,
 	  const json& sctpParameters,
-	  const PeerConnection::Options* peerConnectionOptions,
+	  PeerConnection::Options* peerConnectionOptions,
 	  const json* extendedRtpCapabilities,
 	  const std::map<std::string, bool>* canProduceByKind,
 	  const json& appData)
@@ -161,6 +162,7 @@ namespace mediasoupclient
 		  iceParameters,
 		  iceCandidates,
 		  dtlsParameters,
+		  iceServers,
 		  sctpParameters,
 		  peerConnectionOptions,
 		  sendingRtpParametersByKind,
@@ -392,8 +394,9 @@ namespace mediasoupclient
 	  const json& iceParameters,
 	  const json& iceCandidates,
 	  const json& dtlsParameters,
+	  const json& iceServers,
 	  const json& sctpParameters,
-	  const PeerConnection::Options* peerConnectionOptions,
+	  PeerConnection::Options* peerConnectionOptions,
 	  const json* extendedRtpCapabilities,
 	  const json& appData)
 	  : Transport(listener, id, extendedRtpCapabilities, appData)
@@ -407,6 +410,7 @@ namespace mediasoupclient
 		  iceParameters,
 		  iceCandidates,
 		  dtlsParameters,
+		  iceServers,
 		  sctpParameters,
 		  peerConnectionOptions));
 
