@@ -28,34 +28,38 @@ namespace mediasoupclient
 		  const nlohmann::json& iceParameters,
 		  const nlohmann::json& iceCandidates,
 		  const nlohmann::json& dtlsParameters,
+		  const nlohmann::json& iceServers,
 		  const nlohmann::json& sctpParameters,
-		  const PeerConnection::Options* peerConnectionOptions = nullptr,
-		  const nlohmann::json& appData                        = nlohmann::json::object()) const;
+		  PeerConnection::Options* peerConnectionOptions = nullptr,
+		  const nlohmann::json& appData                  = nlohmann::json::object()) const;
 		SendTransport* CreateSendTransport(
 		  SendTransport::Listener* listener,
 		  const std::string& id,
 		  const nlohmann::json& iceParameters,
 		  const nlohmann::json& iceCandidates,
 		  const nlohmann::json& dtlsParameters,
-		  const PeerConnection::Options* peerConnectionOptions = nullptr,
-		  const nlohmann::json& appData                        = nlohmann::json::object()) const;
+		  const nlohmann::json& iceServers,
+		  PeerConnection::Options* peerConnectionOptions = nullptr,
+		  const nlohmann::json& appData                  = nlohmann::json::object()) const;
 		RecvTransport* CreateRecvTransport(
 		  RecvTransport::Listener* listener,
 		  const std::string& id,
 		  const nlohmann::json& iceParameters,
 		  const nlohmann::json& iceCandidates,
 		  const nlohmann::json& dtlsParameters,
+		  const nlohmann::json& iceServers,
 		  const nlohmann::json& sctpParameters,
-		  const PeerConnection::Options* peerConnectionOptions = nullptr,
-		  const nlohmann::json& appData                        = nlohmann::json::object()) const;
+		  PeerConnection::Options* peerConnectionOptions = nullptr,
+		  const nlohmann::json& appData                  = nlohmann::json::object()) const;
 		RecvTransport* CreateRecvTransport(
 		  RecvTransport::Listener* listener,
 		  const std::string& id,
 		  const nlohmann::json& iceParameters,
 		  const nlohmann::json& iceCandidates,
 		  const nlohmann::json& dtlsParameters,
-		  const PeerConnection::Options* peerConnectionOptions = nullptr,
-		  const nlohmann::json& appData                        = nlohmann::json::object()) const;
+		  const nlohmann::json& iceServers,
+		  PeerConnection::Options* peerConnectionOptions = nullptr,
+		  const nlohmann::json& appData                  = nlohmann::json::object()) const;
 
 	private:
 		// Loaded flag.
