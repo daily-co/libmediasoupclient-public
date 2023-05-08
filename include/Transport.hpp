@@ -119,7 +119,7 @@ namespace mediasoupclient
 		  const nlohmann::json& dtlsParameters,
 		  const nlohmann::json& iceServers,
 		  const nlohmann::json& sctpParameters,
-		  PeerConnection::Options* peerConnectionOptions,
+		  const PeerConnection::Options* peerConnectionOptions,
 		  const nlohmann::json* extendedRtpCapabilities,
 		  const std::map<std::string, bool>* canProduceByKind,
 		  const nlohmann::json& appData);
@@ -194,7 +194,7 @@ namespace mediasoupclient
 		  const nlohmann::json& dtlsParameters,
 		  const nlohmann::json& iceServers,
 		  const nlohmann::json& sctpParameters,
-		  PeerConnection::Options* peerConnectionOptions,
+		  const PeerConnection::Options* peerConnectionOptions,
 		  const nlohmann::json* extendedRtpCapabilities,
 		  const nlohmann::json& appData);
 

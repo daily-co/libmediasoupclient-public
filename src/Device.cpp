@@ -121,7 +121,7 @@ namespace mediasoupclient
 	  const json& dtlsParameters,
 	  const json& iceServers,
 	  const json& sctpParameters,
-	  PeerConnection::Options* peerConnectionOptions,
+	  const PeerConnection::Options* peerConnectionOptions,
 	  const json& appData) const
 	{
 		MSC_TRACE();
@@ -163,7 +163,7 @@ namespace mediasoupclient
 	  const json& iceCandidates,
 	  const json& dtlsParameters,
 	  const json& iceServers,
-	  PeerConnection::Options* peerConnectionOptions,
+	  const PeerConnection::Options* peerConnectionOptions,
 	  const json& appData) const
 	{
 		MSC_TRACE();
@@ -188,7 +188,7 @@ namespace mediasoupclient
 	  const json& dtlsParameters,
 	  const json& iceServers,
 	  const json& sctpParameters,
-	  PeerConnection::Options* peerConnectionOptions,
+	  const PeerConnection::Options* peerConnectionOptions,
 	  const json& appData) const
 	{
 		MSC_TRACE();
@@ -229,7 +229,7 @@ namespace mediasoupclient
 	  const json& iceCandidates,
 	  const json& dtlsParameters,
 	  const json& iceServers,
-	  PeerConnection::Options* peerConnectionOptions,
+	  const PeerConnection::Options* peerConnectionOptions,
 	  const json& appData) const
 	{
 		MSC_TRACE();

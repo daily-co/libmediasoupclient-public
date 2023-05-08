@@ -65,7 +65,7 @@ namespace mediasoupclient
 	  const json& dtlsParameters,
 	  const json& iceServers,
 	  const json& sctpParameters,
-	  PeerConnection::Options* peerConnectionOptions)
+	  const PeerConnection::Options* peerConnectionOptions)
 	  : privateListener(privateListener)
 	{
 		MSC_TRACE();
@@ -86,7 +86,9 @@ namespace mediasoupclient
 
 			webrtcIceServers.push_back(server);
 		}
-		peerConnectionOptions->config.servers = webrtcIceServers;
+		auto updated_config =
+		  webrtc::PeerConnectionInterface::RTCConfiguration(peerConnectionOptions->config);
+		updated_config.servers = webrtcIceServers;
 
 		this->pc.reset(new PeerConnection(this, peerConnectionOptions));
 
@@ -168,7 +170,7 @@ namespace mediasoupclient
 	  const json& dtlsParameters,
 	  const json& iceServers,
 	  const json& sctpParameters,
-	  PeerConnection::Options* peerConnectionOptions,
+	  const PeerConnection::Options* peerConnectionOptions,
 	  const json& sendingRtpParametersByKind,
 	  const json& sendingRemoteRtpParametersByKind)
 	  : Handler(
@@ -687,7 +689,7 @@ namespace mediasoupclient
 	  const json& dtlsParameters,
 	  const json& iceServers,
 	  const json& sctpParameters,
-	  PeerConnection::Options* peerConnectionOptions)
+	  const PeerConnection::Options* peerConnectionOptions)
 	  : Handler(
 	      privateListener,
 	      iceParameters,
