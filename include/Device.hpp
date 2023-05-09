@@ -28,6 +28,7 @@ namespace mediasoupclient
 		  const nlohmann::json& iceParameters,
 		  const nlohmann::json& iceCandidates,
 		  const nlohmann::json& dtlsParameters,
+		  const nlohmann::json& iceServers,
 		  const nlohmann::json& sctpParameters,
 		  const PeerConnection::Options* peerConnectionOptions = nullptr,
 		  const nlohmann::json& appData                        = nlohmann::json::object()) const;
@@ -37,6 +38,7 @@ namespace mediasoupclient
 		  const nlohmann::json& iceParameters,
 		  const nlohmann::json& iceCandidates,
 		  const nlohmann::json& dtlsParameters,
+		  const nlohmann::json& iceServers,
 		  const PeerConnection::Options* peerConnectionOptions = nullptr,
 		  const nlohmann::json& appData                        = nlohmann::json::object()) const;
 		RecvTransport* CreateRecvTransport(
@@ -45,6 +47,7 @@ namespace mediasoupclient
 		  const nlohmann::json& iceParameters,
 		  const nlohmann::json& iceCandidates,
 		  const nlohmann::json& dtlsParameters,
+		  const nlohmann::json& iceServers,
 		  const nlohmann::json& sctpParameters,
 		  const PeerConnection::Options* peerConnectionOptions = nullptr,
 		  const nlohmann::json& appData                        = nlohmann::json::object()) const;
@@ -54,6 +57,7 @@ namespace mediasoupclient
 		  const nlohmann::json& iceParameters,
 		  const nlohmann::json& iceCandidates,
 		  const nlohmann::json& dtlsParameters,
+		  const nlohmann::json& iceServers,
 		  const PeerConnection::Options* peerConnectionOptions = nullptr,
 		  const nlohmann::json& appData                        = nlohmann::json::object()) const;
 

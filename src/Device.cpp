@@ -119,6 +119,7 @@ namespace mediasoupclient
 	  const json& iceParameters,
 	  const json& iceCandidates,
 	  const json& dtlsParameters,
+	  const json& iceServers,
 	  const json& sctpParameters,
 	  const PeerConnection::Options* peerConnectionOptions,
 	  const json& appData) const
@@ -145,6 +146,7 @@ namespace mediasoupclient
 		  iceParameters,
 		  iceCandidates,
 		  dtlsParameters,
+		  iceServers,
 		  sctpParameters,
 		  peerConnectionOptions,
 		  &this->extendedRtpCapabilities,
@@ -160,13 +162,22 @@ namespace mediasoupclient
 	  const json& iceParameters,
 	  const json& iceCandidates,
 	  const json& dtlsParameters,
+	  const json& iceServers,
 	  const PeerConnection::Options* peerConnectionOptions,
 	  const json& appData) const
 	{
 		MSC_TRACE();
 
 		return Device::CreateSendTransport(
-		  listener, id, iceParameters, iceCandidates, dtlsParameters, nullptr, peerConnectionOptions, appData);
+		  listener,
+		  id,
+		  iceParameters,
+		  iceCandidates,
+		  dtlsParameters,
+		  iceServers,
+		  nullptr,
+		  peerConnectionOptions,
+		  appData);
 	}
 
 	RecvTransport* Device::CreateRecvTransport(
@@ -175,6 +186,7 @@ namespace mediasoupclient
 	  const json& iceParameters,
 	  const json& iceCandidates,
 	  const json& dtlsParameters,
+	  const json& iceServers,
 	  const json& sctpParameters,
 	  const PeerConnection::Options* peerConnectionOptions,
 	  const json& appData) const
@@ -201,6 +213,7 @@ namespace mediasoupclient
 		  iceParameters,
 		  iceCandidates,
 		  dtlsParameters,
+		  iceServers,
 		  sctpParameters,
 		  peerConnectionOptions,
 		  &this->extendedRtpCapabilities,
@@ -215,12 +228,21 @@ namespace mediasoupclient
 	  const json& iceParameters,
 	  const json& iceCandidates,
 	  const json& dtlsParameters,
+	  const json& iceServers,
 	  const PeerConnection::Options* peerConnectionOptions,
 	  const json& appData) const
 	{
 		MSC_TRACE();
 
 		return Device::CreateRecvTransport(
-		  listener, id, iceParameters, iceCandidates, dtlsParameters, nullptr, peerConnectionOptions, appData);
+		  listener,
+		  id,
+		  iceParameters,
+		  iceCandidates,
+		  dtlsParameters,
+		  iceServers,
+		  nullptr,
+		  peerConnectionOptions,
+		  appData);
 	}
 } // namespace mediasoupclient

@@ -63,6 +63,7 @@ namespace mediasoupclient
 	  const json& iceParameters,
 	  const json& iceCandidates,
 	  const json& dtlsParameters,
+	  const json& iceServers,
 	  const json& sctpParameters,
 	  const PeerConnection::Options* peerConnectionOptions)
 	  : privateListener(privateListener)
@@ -74,6 +75,20 @@ namespace mediasoupclient
 			this->forcedLocalDtlsRole =
 			  dtlsParameters["role"].get<std::string>() == "server" ? "client" : "server";
 		}
+
+		webrtc::PeerConnectionInterface::IceServers webrtcIceServers;
+		for (auto& iceServer : iceServers)
+		{
+			auto server     = webrtc::PeerConnectionInterface::IceServer();
+			server.username = iceServer.value("username", std::string());
+			server.password = iceServer.value("credential", std::string());
+			server.urls     = iceServer["urls"].get<std::vector<std::string>>();
+
+			webrtcIceServers.push_back(server);
+		}
+		auto updated_config =
+		  webrtc::PeerConnectionInterface::RTCConfiguration(peerConnectionOptions->config);
+		updated_config.servers = webrtcIceServers;
 
 		this->pc.reset(new PeerConnection(this, peerConnectionOptions));
 
@@ -153,12 +168,19 @@ namespace mediasoupclient
 	  const json& iceParameters,
 	  const json& iceCandidates,
 	  const json& dtlsParameters,
+	  const json& iceServers,
 	  const json& sctpParameters,
 	  const PeerConnection::Options* peerConnectionOptions,
 	  const json& sendingRtpParametersByKind,
 	  const json& sendingRemoteRtpParametersByKind)
 	  : Handler(
-	      privateListener, iceParameters, iceCandidates, dtlsParameters, sctpParameters, peerConnectionOptions)
+	      privateListener,
+	      iceParameters,
+	      iceCandidates,
+	      dtlsParameters,
+	      iceServers,
+	      sctpParameters,
+	      peerConnectionOptions)
 	{
 		MSC_TRACE();
 
@@ -665,10 +687,17 @@ namespace mediasoupclient
 	  const json& iceParameters,
 	  const json& iceCandidates,
 	  const json& dtlsParameters,
+	  const json& iceServers,
 	  const json& sctpParameters,
 	  const PeerConnection::Options* peerConnectionOptions)
 	  : Handler(
-	      privateListener, iceParameters, iceCandidates, dtlsParameters, sctpParameters, peerConnectionOptions)
+	      privateListener,
+	      iceParameters,
+	      iceCandidates,
+	      dtlsParameters,
+	      iceServers,
+	      sctpParameters,
+	      peerConnectionOptions)
 	{
 		MSC_TRACE();
 	};

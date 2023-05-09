@@ -126,6 +126,7 @@ namespace mediasoupclient
 	  const json& iceParameters,
 	  const json& iceCandidates,
 	  const json& dtlsParameters,
+	  const json& iceServers,
 	  const json& sctpParameters,
 	  const PeerConnection::Options* peerConnectionOptions,
 	  const json* extendedRtpCapabilities,
@@ -161,6 +162,7 @@ namespace mediasoupclient
 		  iceParameters,
 		  iceCandidates,
 		  dtlsParameters,
+		  iceServers,
 		  sctpParameters,
 		  peerConnectionOptions,
 		  sendingRtpParametersByKind,
@@ -196,7 +198,7 @@ namespace mediasoupclient
 
 		if (codecOptions)
 			ortc::validateProducerCodecOptions(const_cast<json&>(*codecOptions));
-                if (codec)
+		if (codec)
 			ortc::validateRtpCodecCapability(const_cast<json&>(*codec));
 
 		std::string producerId;
@@ -394,6 +396,7 @@ namespace mediasoupclient
 	  const json& iceParameters,
 	  const json& iceCandidates,
 	  const json& dtlsParameters,
+	  const json& iceServers,
 	  const json& sctpParameters,
 	  const PeerConnection::Options* peerConnectionOptions,
 	  const json* extendedRtpCapabilities,
@@ -409,6 +412,7 @@ namespace mediasoupclient
 		  iceParameters,
 		  iceCandidates,
 		  dtlsParameters,
+		  iceServers,
 		  sctpParameters,
 		  peerConnectionOptions));
 
