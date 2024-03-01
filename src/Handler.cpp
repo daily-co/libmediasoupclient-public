@@ -624,7 +624,12 @@ namespace mediasoupclient
 			// CheckRtpParametersInvalidModificationAndValues
 			parameters.encodings[i].rid    = oldEncoding.rid;
 			parameters.encodings[i].ssrc   = oldEncoding.ssrc;
-			parameters.encodings[i].active = oldEncoding.active;
+
+			// Only for helping debugging if we are applying the right changes.
+			//json jsonEncoding = {};
+			//fillJsonRtpEncodingParameters(jsonEncoding, parameters.encodings[i]);
+			//auto encodingAsString = jsonEncoding.dump();
+			//MSC_DEBUG("[Encoding that will be applied: layer:%d, encoding: %s]", i, encodingAsString.c_str());
 		}
 
 		auto result = transceiver->sender()->SetParameters(parameters);
